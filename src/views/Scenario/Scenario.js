@@ -145,6 +145,7 @@ const Scenario = (props) => {
             updateAndLaunchScenario={updateAndLaunchScenario}
             launchScenario={launchScenario}
             workspaceId={workspaceId}
+            scenarioList={scenarioList}
             currentScenario={currentScenario}
             scenarioId={currentScenario.data.id}/>
           }

@@ -32,12 +32,28 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+const PARAMETERS_DEFAULT_VALUES = {
+  stock: 100,
+  restock_qty: 25,
+  nb_waiters: 5,
+  currency: 'USD',
+  currency_name: 'EUR',
+  currency_value: 1000,
+  currency_used: false,
+  start_date: new Date('2014-08-18T21:11:54')
+};
+
+const getDefaultParameterValue = (parameterId) => {
+  return PARAMETERS_DEFAULT_VALUES[parameterId];
+};
+
 const ScenarioParameters = ({
   editMode,
   changeEditMode,
   updateAndLaunchScenario,
   launchScenario,
   workspaceId,
+  scenarioList,
   currentScenario,
   scenarioId
 }) => {
@@ -48,49 +64,69 @@ const ScenarioParameters = ({
 
   // Current scenario parameters
   const parameters = currentScenario.data.parametersValues;
-  const getValueFromParameters = (parameterId, defaultValue) => {
+
+  const getValueFromParameters = (parameterId) => {
     if (parameters === null || parameters === undefined) {
-      return defaultValue;
+      return getDefaultParameterValue(parameterId);
     }
     const param = parameters.find(element => element.parameterId === parameterId);
     if (param !== undefined) {
       return param.value;
     }
-    return defaultValue;
+    return getDefaultParameterValue(parameterId);
+  };
+
+  const getParentParameters = () => {
+    const parentScenario = scenarioList.data.find(
+      scenario => scenario.id === currentScenario.data.parentId);
+    return parentScenario?.parametersValues;
+  };
+
+  const isInherited = (parentParameters, parameterId, newValue) => {
+    // Handle root scenario case
+    if (currentScenario.data.parentId === null) {
+      return false;
+    }
+    // Handle undefined parameters for parent scenario (parent scenario has been
+    // created and parameters have never been updated)
+    if (parentParameters === null || parentParameters === undefined) {
+      return newValue === getDefaultParameterValue(parameterId);
+    }
+    // For the remaining cases, compare with the value of the parameter in the
+    // parent scenario
+    const parentParamenter = parentParameters.find(
+      element => element.parameterId === parameterId);
+    if (parentParamenter !== undefined) {
+      return parentParamenter.value === newValue;
+    }
+    // Parameter has not been found (should not happen)
+    return false;
   };
 
   // State for bar parameters
-  const [stock, setStock] = useState(
-    getValueFromParameters('stock', 100));
-  const [restockQuantity, setRestockQuantity] = useState(
-    getValueFromParameters('restock_qty', 25));
-  const [waitersNumber, setWaitersNumber] = useState(
-    getValueFromParameters('nb_waiters', 5));
+  const [stock, setStock] = useState(getValueFromParameters('stock'));
+  const [restockQuantity, setRestockQuantity] = useState(getValueFromParameters('restock_qty'));
+  const [waitersNumber, setWaitersNumber] = useState(getValueFromParameters('nb_waiters'));
   // State for basic input types examples parameters
-  const [currency, setCurrency] = useState(
-    getValueFromParameters('currency', 'USD'));
-  const [currencyName, setCurrencyName] = useState(
-    getValueFromParameters('currency_name', 'EUR'));
-  const [currencyValue, setCurrencyValue] = useState(
-    getValueFromParameters('currency_value', 1000));
-  const [currencyUsed, setCurrencyUsed] = useState(
-    getValueFromParameters('currency_used', false));
-  const [startDate, setStartDate] = useState(
-    getValueFromParameters('start_date', new Date('2014-08-18T21:11:54')));
+  const [currency, setCurrency] = useState(getValueFromParameters('currency'));
+  const [currencyName, setCurrencyName] = useState(getValueFromParameters('currency_name'));
+  const [currencyValue, setCurrencyValue] = useState(getValueFromParameters('currency_value'));
+  const [currencyUsed, setCurrencyUsed] = useState(getValueFromParameters('currency_used'));
+  const [startDate, setStartDate] = useState(getValueFromParameters('start_date'));
 
   const resetParameters = () => {
-    setStock(getValueFromParameters('stock', 100));
-    setRestockQuantity(getValueFromParameters('restock_qty', 25));
-    setWaitersNumber(getValueFromParameters('nb_waiters', 5));
-    setCurrency(getValueFromParameters('currency', 'USD'));
-    setCurrencyName(getValueFromParameters('currency_name', 'EUR'));
-    setCurrencyValue(getValueFromParameters('currency_value', 1000));
-    setCurrencyUsed(getValueFromParameters('currency_used', false));
-    setStartDate(getValueFromParameters(
-      'start_date', new Date('2014-08-18T21:11:54')));
+    setStock(getValueFromParameters('stock'));
+    setRestockQuantity(getValueFromParameters('restock_qty'));
+    setWaitersNumber(getValueFromParameters('nb_waiters'));
+    setCurrency(getValueFromParameters('currency'));
+    setCurrencyName(getValueFromParameters('currency_name'));
+    setCurrencyValue(getValueFromParameters('currency_value'));
+    setCurrencyUsed(getValueFromParameters('currency_used'));
+    setStartDate(getValueFromParameters('start_date'));
   };
 
   const getParametersDataForApi = (runTemplateId) => {
+    const parentParameters = getParentParameters();
     let parametersData = [];
     // Add bar parameters if necessary (run templates '1' and '2')
     if (['1', '2'].indexOf(runTemplateId) !== -1) {
@@ -99,19 +135,19 @@ const ScenarioParameters = ({
           parameterId: 'stock',
           varType: 'int',
           value: stock,
-          isInherited: stock !== getValueFromParameters('stock')
+          isInherited: isInherited(parentParameters, 'stock', stock)
         },
         {
           parameterId: 'restock_qty',
           varType: 'int',
           value: restockQuantity,
-          isInherited: restockQuantity !== getValueFromParameters('restock_qty')
+          isInherited: isInherited(parentParameters, 'restock_qty', restockQuantity)
         },
         {
           parameterId: 'nb_waiters',
           varType: 'int',
           value: waitersNumber,
-          isInherited: waitersNumber !== getValueFromParameters('nb_waiters')
+          isInherited: isInherited(parentParameters, 'nb_waiters', waitersNumber)
         }
       ]);
     }
@@ -123,31 +159,31 @@ const ScenarioParameters = ({
           parameterId: 'currency',
           varType: 'enum',
           value: currency,
-          isInherited: currency !== getValueFromParameters('currency')
+          isInherited: isInherited(parentParameters, 'currency', currency)
         },
         {
           parameterId: 'currency_name',
           varType: 'string',
           value: currencyName,
-          isInherited: currencyName !== getValueFromParameters('currency_name')
+          isInherited: isInherited(parentParameters, 'currency_name', currencyName)
         },
         {
           parameterId: 'currency_value',
           varType: 'number',
           value: currencyValue,
-          isInherited: currencyValue !== getValueFromParameters('currency_value')
+          isInherited: isInherited(parentParameters, 'currency_value', currencyValue)
         },
         {
           parameterId: 'currency_used',
           varType: 'bool',
           value: currencyUsed,
-          isInherited: currencyUsed !== getValueFromParameters('currency_used')
+          isInherited: isInherited(parentParameters, 'currency_used', currencyUsed)
         },
         {
           parameterId: 'start_date',
           varType: 'date',
           value: startDate,
-          isInherited: startDate !== getValueFromParameters('start_date')
+          isInherited: isInherited(parentParameters, 'start_date', startDate)
         }
       ]);
     }
@@ -286,6 +322,7 @@ ScenarioParameters.propTypes = {
   updateAndLaunchScenario: PropTypes.func.isRequired,
   launchScenario: PropTypes.func.isRequired,
   workspaceId: PropTypes.string.isRequired,
+  scenarioList: PropTypes.object.isRequired,
   scenarioId: PropTypes.string.isRequired,
   currentScenario: PropTypes.object.isRequired
 };
