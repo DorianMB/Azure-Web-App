@@ -307,6 +307,11 @@
         "tab": {
           "title": "Tableaux de bord"
         }
+      },
+      "scenariomanager": {
+        "tab": {
+          "title": "Gestion des scénarios"
+        }
       }
     }
   }

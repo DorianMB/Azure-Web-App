@@ -1,7 +1,7 @@
 // Copyright (c) Cosmo Tech.
 // Licensed under the MIT license.
 
-import { Scenario as ScenarioView, Dashboards } from '../views';
+import { Scenario as ScenarioView, Dashboards, ScenarioManager } from '../views';
 import React from 'react';
 import { DistributedTracingModes } from '@microsoft/applicationinsights-web';
 
@@ -18,6 +18,12 @@ export const tabs = [
     label: 'layouts.tabs.dashboards.tab.title',
     to: '/dashboards',
         render: () => <Dashboards /> // eslint-disable-line
+  },
+  {
+    key: 'tabs.scenariomanager.key',
+    label: 'layouts.tabs.scenariomanager.tab.title',
+    to: '/scenarioManager',
+        render: () => <ScenarioManager /> // eslint-disable-line
   }
 ];
 

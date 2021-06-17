@@ -300,12 +300,17 @@
     "tabs": {
       "scenario": {
         "tab": {
-          "title": "SCENARIO VIEW"
+          "title": "Scenario View"
         }
       },
       "dashboards": {
         "tab": {
           "title": "Dashboards"
+        }
+      },
+      "scenariomanager": {
+        "tab": {
+          "title": "Scenario Manager"
         }
       }
     }
