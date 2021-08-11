@@ -102,6 +102,13 @@ const Scenario = (props) => {
     : t('views.scenario.dropdown.scenario.label', Scenario);
   const showBackdrop = currentScenario.status === STATUSES.LOADING;
 
+  let filteredRunTemplates = runTemplateList.data;
+  const solutionRunTemplates = workspace.data?.solution?.runTemplateFilter;
+  if (solutionRunTemplates) {
+    filteredRunTemplates = filteredRunTemplates.filter(
+      runTemplate => solutionRunTemplates.indexOf(runTemplate.id) !== -1);
+  }
+
   return (
     <>
       <Backdrop className={classes.backdrop} open={showBackdrop}>
@@ -139,7 +146,7 @@ const Scenario = (props) => {
                     workspaceId={workspaceId}
                     createScenario={createScenario}
                     currentScenario={currentScenario}
-                    runTemplates={runTemplateList.data}
+                    runTemplates={filteredRunTemplates}
                     datasets={datasetList.data}
                     scenarios={scenarioList.data}
                     user={user}
