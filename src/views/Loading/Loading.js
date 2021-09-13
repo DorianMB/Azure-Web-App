@@ -27,7 +27,6 @@ const Loading = (
     scenarioList,
     currentScenario,
     powerBiInfo,
-    runTemplateList,
     workspace,
     solution,
     datasetList,
@@ -95,13 +94,6 @@ const Loading = (
               width={120}
             />
             <LoadingLine
-              titleKey={'genericcomponent.loading.line.runtemplate.list.title'}
-              hasError={hasErrors(runTemplateList)}
-              isLoading={isLoading(runTemplateList)}
-              height={100}
-              width={120}
-            />
-            <LoadingLine
               titleKey={'genericcomponent.loading.line.powerbi.title'}
               hasError={hasErrors(powerBiInfo)}
               isLoading={isLoading(powerBiInfo)}
@@ -121,7 +113,6 @@ Loading.propTypes = {
   tabs: PropTypes.array.isRequired,
   powerBiInfo: PropTypes.object.isRequired,
   currentScenario: PropTypes.object.isRequired,
-  runTemplateList: PropTypes.object.isRequired,
   scenarioList: PropTypes.object.isRequired,
   workspace: PropTypes.object.isRequired,
   solution: PropTypes.object.isRequired,
