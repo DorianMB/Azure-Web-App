@@ -55,6 +55,22 @@ const PARAMETERS = {
   },
   start_date: {
     defaultValue: new Date('2014-08-18T21:11:54')
+  },
+  initial_stock_dataset: {
+    connectorId: 'C-XPv4LBVGAL',
+    defaultFileTypeFilter: '.zip,.csv,.json,.xls,.xlsx'
+  },
+  example_dataset_part_1: {
+    connectorId: 'C-XPv4LBVGAL',
+    defaultFileTypeFilter: '.zip,.csv,.json,.xls,.xlsx'
+  },
+  example_dataset_part_2: {
+    connectorId: 'C-XPv4LBVGAL',
+    defaultFileTypeFilter: '.zip,.csv,.json,.xls,.xlsx'
+  },
+  example_dataset_part_3: {
+    connectorId: 'C-XPv4LBVGAL',
+    defaultFileTypeFilter: '.zip,.csv,.json,.xls,.xlsx'
   }
 };
 
@@ -97,13 +113,13 @@ const PARAMETERS_GROUPS = {
       'initial_stock_dataset'
     ]
   },
-  extra_dataset_part_tab: {
+  extra_dataset_part: {
     labels: {
       en: 'Additional dataset part',
       fr: 'Fragment de dataset'
     },
     parameters: [
-      'initial_stock_dataset'
+      'example_dataset_part_3'
     ]
   }
 };
@@ -117,7 +133,7 @@ const RUN_TEMPLATES = {
     // with back-end format
     parameterGroups: [
       'basic_types',
-      'extra_dataset_part_tab'
+      'extra_dataset_part'
     ]
   }
 };
@@ -126,13 +142,4 @@ export const SCENARIO_PARAMETERS_CONFIG = {
   parameters: PARAMETERS,
   parametersGroups: PARAMETERS_GROUPS,
   runTemplates: RUN_TEMPLATES
-};
-
-// Dataset part (file) tab parameter
-export const INITIAL_STOCK_PARAM = {
-  id: 'initial_stock_dataset',
-  description: 'Initial stock dataset part',
-  varType: '%DATASETID%',
-  connectorId: 'C-XPv4LBVGAL',
-  defaultFileTypeFilter: '.zip,.csv,.json,.xls,.xlsx'
 };

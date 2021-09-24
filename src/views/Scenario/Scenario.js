@@ -176,6 +176,7 @@ const Scenario = (props) => {
                 launchScenario={launchScenario}
                 workspaceId={workspaceId}
                 solution={solution.data}
+                datasets={datasetList.data}
                 currentScenario={currentScenario}
                 scenarioId={currentScenario.data.id}/>
             }
