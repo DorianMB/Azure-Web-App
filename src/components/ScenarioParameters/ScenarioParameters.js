@@ -1,7 +1,7 @@
 // Copyright (c) Cosmo Tech.
 // Licensed under the MIT license.
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
 import {
   Grid,
@@ -78,31 +78,31 @@ const ScenarioParameters = ({
       solution.parameters,
       SCENARIO_PARAMETERS_CONFIG.parameters
     ), [runTemplateParametersIds, solution.parameters]);
-  // Memoize the reset values for the run template parameters, based on defaultParametersValues and scenario data
-  const parametersValuesForReset = useMemo(
-    () => ScenarioParametersUtils.getParametersValuesForReset(
-      runTemplateParametersIds,
-      defaultParametersValues,
-      currentScenario.data?.parametersValues
-    ), [runTemplateParametersIds, defaultParametersValues, currentScenario.data?.parametersValues]);
-
   // Memoize the data of parameters groups (not including the current state of scenario parameters)
   const parametersGroupsData = useMemo(
     () => ScenarioParametersUtils.generateParametersGroupsData(
       solution, SCENARIO_PARAMETERS_CONFIG, currentScenario.data?.runTemplateId),
     [solution, currentScenario.data?.runTemplateId]);
 
+  // Store the reset values for the run template parameters, based on defaultParametersValues and scenario data.
+  const parametersValuesRef = useRef({});
+  parametersValuesRef.current = ScenarioParametersUtils.getParametersValuesForReset(
+    runTemplateParametersIds,
+    defaultParametersValues,
+    currentScenario.data?.parametersValues
+  );
+
   // Add scenario parameters data in state
-  const [parameters, setParameters] = useState(parametersValuesForReset);
+  const [parametersValuesToRender, setParametersValuesToRender] = useState(parametersValuesRef.current);
 
   useEffect(() => {
-    setParameters(parametersValuesForReset);
+    resetParameters(false);
     // eslint-disable-next-line
   }, [currentScenario]);
 
   for (const parametersGroupData of parametersGroupsData) {
     parametersGroupData.tab = ScenarioParametersTabFactory.create(
-      t, parametersGroupData, parameters, setParameters, editMode);
+      t, parametersGroupData, parametersValuesToRender, setParametersValuesToRender, editMode);
   }
 
   // State for File Upload
@@ -125,11 +125,6 @@ const ScenarioParameters = ({
   }, [currentScenario]);
 
   useEffect(() => {
-    resetParameters(false);
-    // eslint-disable-next-line
-  }, [currentScenario.id]);
-
-  useEffect(() => {
     UploadFileUtils.updateDatasetState(initialStockDatasetId,
       initialStockFile,
       () => fetchDatasetById(initialStockDatasetId),
@@ -140,16 +135,22 @@ const ScenarioParameters = ({
   }, [initialStockDatasetId]);
 
   const resetParameters = (resetFile) => {
-    setParameters(parametersValuesForReset);
+    setParametersValuesToRender(parametersValuesRef.current);
+    // TODO: adapt values for "file" parameters
     // Upload file
     if (resetFile) {
       UploadFileUtils.resetUploadFile(initialStockDatasetId, initialStockFile, setInitialStockFile);
     }
   };
 
+  const setParametersValuesRefFromState = () => {
+    parametersValuesRef.current = parametersValuesToRender;
+    // TODO: adapt values for "file" parameters
+  };
+
   const getParametersForUpdate = (newDataset) => {
     let parametersData = ScenarioParametersUtils.buildParametersForUpdate(
-      solution, parameters, runTemplateParametersIds);
+      solution, parametersValuesRef.current, runTemplateParametersIds);
 
     if (['1', '2', '3', '4'].indexOf(currentScenario.data.runTemplateId) !== -1) {
       if (newDataset && Object.keys(newDataset).length !== 0) {
@@ -189,6 +190,7 @@ const ScenarioParameters = ({
         currentScenario.data.parametersValues.length === 0) {
       handleClickOnUpdateAndLaunchScenarioButton();
     } else {
+      setParametersValuesRefFromState();
       launchScenario(workspaceId, scenarioId);
       changeEditMode(false);
     }
@@ -205,7 +207,7 @@ const ScenarioParameters = ({
       INITIAL_STOCK_PARAM.connectorId,
       currentScenario.data.id,
       workspaceId);
-
+    setParametersValuesRefFromState();
     const parametersForUpdate = getParametersForUpdate(newDataset);
     updateAndLaunchScenario(workspaceId, scenarioId, parametersForUpdate);
     changeEditMode(false);
