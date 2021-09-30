@@ -10,6 +10,7 @@ import { PrivateRoute, UserInfo } from '@cosmotech/ui';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES } from '../../config/AppConfiguration';
 import theme from '../../theme/';
+import profilePlaceholder from '../../assets/profile_placeholder.png';
 
 const useStyles = makeStyles(theme => ({
   content: {
@@ -74,8 +75,14 @@ const TabLayout = props => {
     tabs, authenticated, authorized, signInPath,
     unauthorizedPath
   } = props;
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
+
+  const userInfoLabels = {
+    language: t('genericcomponent.userinfo.button.change.language'),
+    documentation: t('genericcomponent.userinfo.button.download.documentation'),
+    logOut: t('genericcomponent.userinfo.button.logout')
+  };
 
   return (
     <>
@@ -96,9 +103,13 @@ const TabLayout = props => {
           </Tabs>
           <div className={classes.rightBar}>
             <div className={classes.rightBarElement}>
-              <UserInfo documentationUrl="doc.pdf" languages={LANGUAGES}
+              <UserInfo documentationUrl="doc.pdf"
+                languages={LANGUAGES}
+                changeLanguage={(lang) => i18n.changeLanguage(lang)}
+                language={i18n.language}
+                labels={userInfoLabels}
                 userName={props.userName}
-                profilePictureUrl={props.userProfilePic}
+                profilePlaceholder={props.userProfilePic ? props.userProfilePic : profilePlaceholder}
                 onLogout={Auth.signOut}
               />
             </div>
