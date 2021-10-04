@@ -6,10 +6,16 @@ import rfdc from 'rfdc';
 const clone = rfdc();
 
 export const sortScenarioList = (scenarioList) => {
+  console.log('avant: ');
+  console.log(JSON.parse(JSON.stringify(scenarioList)));
+
   const sortedList = [];
   let hasMovedScenarios = true;
   while (hasMovedScenarios && scenarioList.length !== 0) {
     const scenarioListCopy = clone(scenarioList);
+    scenarioListCopy.sort((a, b) => {
+      return (a.name.toUpperCase() < b.name.toUpperCase() ? -1 : 1);
+    });
     hasMovedScenarios = false;
     for (let i = 0; i < scenarioListCopy.length; ++i) {
       const scenario = scenarioListCopy[i];
@@ -31,5 +37,7 @@ export const sortScenarioList = (scenarioList) => {
       }
     }
   }
+  console.log('après: ');
+  console.log(JSON.parse(JSON.stringify(sortedList)));
   return sortedList;
 };
